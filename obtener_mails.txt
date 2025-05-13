@@ -1,0 +1,23 @@
+Ir a google Sheets, en extensiones copiar y pegar esta función. Luego guardar y ejecutar.
+
+function extraerHotSale() {
+  const hoja = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  hoja.clear(); // limpia la hoja
+  hoja.appendRow(["Fecha", "Remitente", "Asunto", "Texto del cuerpo"]);
+
+  // Define el término de búsqueda (podés personalizar)
+  const hilos = GmailApp.search('subject:("hot sale" OR "oferta" OR "OFF" OR "off" OR "HOT DAYS" OR "HOTSALE" OR "HOT SALE" OR "HOT" OR "CUOTAS" OR "descuento") newer_than:5d');
+
+  hilos.forEach(hilo => {
+    const mensajes = hilo.getMessages();
+    mensajes.forEach(msg => {
+      const fecha = msg.getDate();
+      const remitente = msg.getFrom();
+      const asunto = msg.getSubject();
+      const cuerpo = msg.getPlainBody();
+      hoja.appendRow([fecha, remitente, asunto, cuerpo.substring(0, 5000)]); // limita caracteres
+    });
+  });
+
+  SpreadsheetApp.flush();
+}
